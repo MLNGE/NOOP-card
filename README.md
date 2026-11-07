@@ -2,7 +2,20 @@
 
 A compact, wide Home Assistant Lovelace card for displaying NOOP charge, effort, rest, battery, steps, and the time since the last sync.
 
-## Installation
+## Installation with HACS
+
+1. Add this repository to HACS as a custom **Dashboard** repository.
+2. Install **NOOP Card** from HACS.
+3. Add the card resource under **Settings > Dashboards > Resources**:
+
+   ```yaml
+   url: /hacsfiles/noop-card/noop-card.js
+   type: module
+   ```
+
+4. Add the card to your dashboard.
+
+## Manual installation
 
 1. Copy `noop-card.js` into your Home Assistant `/config/www/noop-card/` directory.
 2. Add the resource under **Settings > Dashboards > Resources**:

@@ -1,0 +1,6 @@
+{
+  "name": "NOOP Card",
+  "content_in_root": true,
+  "filename": "noop-card.js",
+  "render_readme": true
+}
