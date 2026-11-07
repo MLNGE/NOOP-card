@@ -31,6 +31,8 @@ The metric circles use each metric value as a percentage of a 100-point scale. F
 
 After the card is added, it can also be configured through the visual card editor. The editor provides entity selectors filtered to the `noop_push` integration for the primary NOOP entity, charge, effort, rest, battery, steps, and sync.
 
+The visual editor is exposed through the card's `getConfigElement()` API, so Home Assistant can discover it when editing a `custom:noop-card`.
+
 ## Basic configuration
 
 ```yaml

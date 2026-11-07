@@ -215,6 +215,16 @@ function relativeTime(timestamp, now = Date.now()) {
 }
 
 class NoopCard extends HTMLElement {
+  static getConfigElement() {
+    return document.createElement("noop-card-editor");
+  }
+
+  static getStubConfig() {
+    return {
+      entity: DEFAULT_METRICS.charge,
+    };
+  }
+
   constructor() {
     super();
     this.attachShadow({ mode: "open" });
@@ -453,6 +463,5 @@ window.customCards.push({
   type: "noop-card",
   name: "NOOP Metrics Card",
   description: "A compact, wide card for NOOP health metrics.",
-  editor: "noop-card-editor",
   preview: true,
 });
