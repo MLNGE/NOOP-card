@@ -267,10 +267,118 @@ class NoopCard extends HTMLElement {
 
 customElements.define("noop-card", NoopCard);
 
+class NoopCardEditor extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: "open" });
+    this._config = {};
+    this._hass = null;
+    this._schema = [
+      {
+        name: "entity",
+        label: "Primary NOOP entity",
+        selector: { entity: { domain: "sensor" } },
+      },
+      {
+        name: "charge",
+        label: "Charge entity",
+        selector: { entity: { domain: "sensor" } },
+      },
+      {
+        name: "effort",
+        label: "Effort entity",
+        selector: { entity: { domain: "sensor" } },
+      },
+      {
+        name: "rest",
+        label: "Rest entity",
+        selector: { entity: { domain: "sensor" } },
+      },
+      {
+        name: "battery",
+        label: "Battery entity",
+        selector: { entity: { domain: "sensor" } },
+      },
+      {
+        name: "steps",
+        label: "Steps entity",
+        selector: { entity: { domain: "sensor" } },
+      },
+      {
+        name: "sync",
+        label: "Sync entity",
+        selector: { entity: { domain: "sensor" } },
+      },
+    ];
+  }
+
+  setConfig(config) {
+    const entities = config.entities || {};
+    this._config = {
+      ...config,
+      charge: entities.charge || "",
+      effort: entities.effort || "",
+      rest: entities.rest || "",
+      battery: entities.battery || "",
+      steps: entities.steps || "",
+      sync: entities.sync || "",
+    };
+    this._render();
+  }
+
+  set hass(hass) {
+    this._hass = hass;
+    this._render();
+  }
+
+  _render() {
+    const form = this.shadowRoot.querySelector("ha-form");
+    if (!form) {
+      this.shadowRoot.innerHTML = `
+        <style>
+          ha-form { display: block; padding: 8px 0; }
+        </style>
+        <ha-form></ha-form>
+      `;
+    }
+
+    const currentForm = this.shadowRoot.querySelector("ha-form");
+    currentForm.hass = this._hass;
+    currentForm.schema = this._schema;
+    currentForm.data = this._config;
+    currentForm.computeLabel = (schema) => schema.label;
+    currentForm.addEventListener("value-changed", (event) => this._valueChanged(event), { once: true });
+  }
+
+  _valueChanged(event) {
+    const value = event.detail.value || {};
+    const entities = {};
+    for (const key of ["charge", "effort", "rest", "battery", "steps", "sync"]) {
+      if (value[key]) entities[key] = value[key];
+    }
+
+    const config = {
+      type: "custom:noop-card",
+      entity: value.entity || undefined,
+      entities,
+    };
+    this._config = { ...value, entities };
+    this.dispatchEvent(new CustomEvent("config-changed", {
+      detail: { config },
+      bubbles: true,
+      composed: true,
+    }));
+    this._render();
+  }
+}
+
+customElements.define("noop-card-editor", NoopCardEditor);
+
 window.customCards = window.customCards || [];
 window.customCards.push({
   type: "noop-card",
   name: "NOOP Metrics Card",
   description: "A compact, wide card for NOOP health metrics.",
+  editor: "noop-card-editor",
   preview: true,
 });

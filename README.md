@@ -4,7 +4,7 @@ A compact, wide Home Assistant Lovelace card for displaying NOOP charge, effort,
 
 ## Installation
 
-1. Copy `noop-card.js` and `noop-card-editor.js` into your Home Assistant `/config/www/noop-card/` directory.
+1. Copy `noop-card.js` into your Home Assistant `/config/www/noop-card/` directory.
 2. Add the resource under **Settings > Dashboards > Resources**:
 
    ```yaml
@@ -13,6 +13,8 @@ A compact, wide Home Assistant Lovelace card for displaying NOOP charge, effort,
    ```
 
 3. Add the card to a dashboard using YAML mode.
+
+After the card is added, it can also be configured through the visual card editor. The editor provides entity selectors for the primary NOOP entity, charge, effort, rest, battery, steps, and sync.
 
 ## Basic configuration
 
