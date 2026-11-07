@@ -24,8 +24,8 @@ const styles = `
 
   .card {
     box-sizing: border-box;
-    min-height: 184px;
-    padding: 18px 22px 14px;
+    min-height: 0;
+    padding: 10px 18px 9px;
     overflow: hidden;
     color: var(--noop-card-text);
     background: var(--noop-card-background);
@@ -37,7 +37,7 @@ const styles = `
   .metrics {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: clamp(12px, 5vw, 42px);
+    gap: clamp(8px, 4vw, 32px);
     align-items: start;
   }
 
@@ -47,26 +47,82 @@ const styles = `
   }
 
   .circle {
+    position: relative;
     display: grid;
-    width: clamp(72px, 13vw, 116px);
+    width: clamp(58px, 11vw, 92px);
     aspect-ratio: 1;
-    margin: 0 auto 8px;
+    margin: 0 auto 4px;
     place-items: center;
+    overflow: hidden;
     border: 1px solid rgb(255 255 255 / 12%);
     border-radius: 50%;
-    background: var(--metric-color);
+    background: #101c2d;
     box-shadow: inset 0 14px 20px rgb(0 0 0 / 20%);
   }
 
+  .fill {
+    position: absolute;
+    right: -12%;
+    bottom: 0;
+    left: -12%;
+    height: var(--fill-height);
+    overflow: hidden;
+    background: var(--metric-color);
+    transition: height 600ms ease;
+  }
+
+  .fill::before,
+  .fill::after {
+    position: absolute;
+    top: -7px;
+    left: -30%;
+    width: 160%;
+    height: 14px;
+    border-radius: 45%;
+    background: rgb(255 255 255 / 18%);
+    content: "";
+    animation: noop-wave 4s ease-in-out infinite;
+  }
+
+  .fill::after {
+    top: -3px;
+    opacity: 0.45;
+    animation-delay: -2s;
+    animation-duration: 5.5s;
+  }
+
+  .sparkles {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 22% 30%, rgb(255 255 255 / 75%) 0 1px, transparent 1.8px),
+      radial-gradient(circle at 70% 22%, rgb(255 255 255 / 55%) 0 1px, transparent 1.8px),
+      radial-gradient(circle at 80% 66%, rgb(255 255 255 / 65%) 0 1px, transparent 1.8px),
+      radial-gradient(circle at 38% 78%, rgb(255 255 255 / 45%) 0 1px, transparent 1.8px);
+    animation: noop-sparkle 3s ease-in-out infinite alternate;
+  }
+
+  @keyframes noop-wave {
+    0%, 100% { transform: translateX(-3%) rotate(1deg); }
+    50% { transform: translateX(3%) rotate(-1deg); }
+  }
+
+  @keyframes noop-sparkle {
+    0% { opacity: 0.25; transform: scale(0.96); }
+    100% { opacity: 0.85; transform: scale(1.04); }
+  }
+
   .value {
-    font-size: clamp(1.7rem, 4vw, 2.2rem);
+    position: relative;
+    z-index: 1;
+    font-size: clamp(1.35rem, 3.2vw, 1.9rem);
     font-weight: 700;
     line-height: 1;
   }
 
   .label {
     color: var(--noop-card-muted);
-    font-size: 0.72rem;
+    font-size: 0.65rem;
     font-weight: 700;
     letter-spacing: 0.12em;
     text-transform: uppercase;
@@ -75,10 +131,10 @@ const styles = `
   .details {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    margin-top: 16px;
+    gap: 8px;
+    margin-top: 8px;
     color: var(--noop-card-muted);
-    font-size: 0.78rem;
+    font-size: 0.68rem;
     text-align: center;
   }
 
@@ -91,7 +147,7 @@ const styles = `
     display: block;
     overflow: hidden;
     color: var(--noop-card-text);
-    font-size: 0.9rem;
+    font-size: 0.78rem;
     font-weight: 600;
     text-overflow: ellipsis;
   }
@@ -101,10 +157,15 @@ const styles = `
     line-height: 1.4;
   }
 
+  @media (prefers-reduced-motion: reduce) {
+    .fill { transition: none; }
+    .fill::before, .fill::after, .sparkles { animation: none; }
+  }
+
   @media (max-width: 420px) {
-    .card { padding-inline: 12px; }
-    .details { gap: 4px; font-size: 0.68rem; }
-    .detail strong { font-size: 0.78rem; }
+    .card { padding-inline: 10px; }
+    .details { gap: 3px; font-size: 0.62rem; }
+    .detail strong { font-size: 0.72rem; }
   }
 `;
 
@@ -117,6 +178,12 @@ function formatValue(state, fallback = "—") {
   const value = Number(state.state);
   if (!Number.isFinite(value)) return state.state;
   return Number.isInteger(value) ? String(value) : value.toFixed(1);
+}
+
+function metricPercentage(state) {
+  if (isUnavailable(state)) return 0;
+  const value = Number(state.state);
+  return Number.isFinite(value) ? Math.min(100, Math.max(0, value)) : 0;
 }
 
 function formatBattery(state) {
@@ -174,7 +241,7 @@ class NoopCard extends HTMLElement {
   }
 
   getCardSize() {
-    return 3;
+    return 2;
   }
 
   disconnectedCallback() {
@@ -244,7 +311,8 @@ class NoopCard extends HTMLElement {
 
     const metrics = METRIC_DEFINITIONS.map(({ key, label, className }) => `
       <div class="metric">
-        <div class="circle" style="--metric-color: var(--noop-${className}, ${className === "rest" ? "#20af6d" : className === "effort" ? "#b77724" : "#c56b36"})">
+        <div class="circle" style="--metric-color: var(--noop-${className}, ${className === "rest" ? "#20af6d" : className === "effort" ? "#b77724" : "#c56b36"}); --fill-height: ${metricPercentage(states[key])}%">
+          <div class="fill"><span class="sparkles"></span></div>
           <span class="value">${formatValue(states[key])}</span>
         </div>
         <div class="label">${label}</div>
