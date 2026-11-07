@@ -1,0 +1,9 @@
+{
+  "name": "noop-card",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Compact Home Assistant Lovelace card for NOOP health metrics.",
+  "scripts": {
+    "check": "node --check noop-card.js && node --check noop-card-editor.js"
+  }
+}
