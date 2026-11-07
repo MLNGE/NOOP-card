@@ -4,6 +4,8 @@ A compact, wide Home Assistant Lovelace card for displaying NOOP charge, effort,
 
 The metric circles use each metric value as a percentage of a 100-point scale. For example, a charge value of `18` fills the circle to `18%`. The fill includes subtle animated waves and sparkles, with animation automatically reduced when the system requests reduced motion.
 
+This card is designed to work with the [NOOP Push Home Assistant integration](https://github.com/MLNGE/NOOP-push), which provides the NOOP entities shown by the card.
+
 ## Installation with HACS
 
 1. Add this repository to HACS as a custom **Dashboard** repository.

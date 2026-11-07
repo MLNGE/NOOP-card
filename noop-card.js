@@ -83,14 +83,15 @@ const styles = `
     border-radius: 45%;
     background: rgb(255 255 255 / 18%);
     content: "";
-    animation: noop-wave 4s ease-in-out infinite;
+    animation: noop-wave 7s linear infinite;
+    will-change: transform;
   }
 
   .fill::after {
     top: -3px;
     opacity: 0.45;
-    animation-delay: -2s;
-    animation-duration: 5.5s;
+    animation-delay: -3.5s;
+    animation-duration: 9s;
   }
 
   .sparkles {
@@ -101,12 +102,16 @@ const styles = `
       radial-gradient(circle at 70% 22%, rgb(255 255 255 / 55%) 0 1px, transparent 1.8px),
       radial-gradient(circle at 80% 66%, rgb(255 255 255 / 65%) 0 1px, transparent 1.8px),
       radial-gradient(circle at 38% 78%, rgb(255 255 255 / 45%) 0 1px, transparent 1.8px);
-    animation: noop-sparkle 3s ease-in-out infinite alternate;
+    animation: noop-sparkle 4.5s ease-in-out infinite alternate;
+    will-change: opacity, transform;
   }
 
   @keyframes noop-wave {
-    0%, 100% { transform: translateX(-3%) rotate(1deg); }
-    50% { transform: translateX(3%) rotate(-1deg); }
+    0% { transform: translate3d(-4%, 1px, 0) rotate(1deg); }
+    25% { transform: translate3d(-1%, -1px, 0) rotate(0deg); }
+    50% { transform: translate3d(4%, 1px, 0) rotate(-1deg); }
+    75% { transform: translate3d(1%, -1px, 0) rotate(0deg); }
+    100% { transform: translate3d(-4%, 1px, 0) rotate(1deg); }
   }
 
   @keyframes noop-sparkle {
@@ -132,8 +137,8 @@ const styles = `
 
   .details {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(8px, 4vw, 32px);
     margin-top: 8px;
     color: var(--noop-card-muted);
     font-size: 0.68rem;
@@ -142,6 +147,9 @@ const styles = `
 
   .detail {
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     white-space: nowrap;
   }
 
