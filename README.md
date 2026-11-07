@@ -1,5 +1,7 @@
 # NOOP Card
 
+<img src="logo.png" alt="NOOP logo" width="160">
+
 A compact, wide Home Assistant Lovelace card for displaying NOOP charge, effort, rest, battery, steps, and the time since the last sync.
 
 The metric circles use each metric value as a percentage of a 100-point scale. For example, a charge value of `18` fills the circle to `18%`. The fill includes subtle animated waves and sparkles, with animation automatically reduced when the system requests reduced motion.
