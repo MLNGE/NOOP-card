@@ -29,7 +29,7 @@ The metric circles use each metric value as a percentage of a 100-point scale. F
 
 3. Add the card to a dashboard using YAML mode.
 
-After the card is added, it can also be configured through the visual card editor. The editor provides entity selectors for the primary NOOP entity, charge, effort, rest, battery, steps, and sync.
+After the card is added, it can also be configured through the visual card editor. The editor provides entity selectors filtered to the `noop_push` integration for the primary NOOP entity, charge, effort, rest, battery, steps, and sync.
 
 ## Basic configuration
 

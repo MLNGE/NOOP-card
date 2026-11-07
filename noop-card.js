@@ -13,6 +13,8 @@ const METRIC_DEFINITIONS = [
   { key: "rest", label: "Rest", className: "rest" },
 ];
 
+const NOOP_ENTITY_SELECTOR = { entity: { domain: "sensor", integration: "noop_push" } };
+
 const styles = `
   :host {
     display: block;
@@ -341,41 +343,42 @@ class NoopCardEditor extends HTMLElement {
     this.attachShadow({ mode: "open" });
     this._config = {};
     this._hass = null;
+    this._handleValueChanged = (event) => this._valueChanged(event);
     this._schema = [
       {
         name: "entity",
         label: "Primary NOOP entity",
-        selector: { entity: { domain: "sensor" } },
+        selector: NOOP_ENTITY_SELECTOR,
       },
       {
         name: "charge",
         label: "Charge entity",
-        selector: { entity: { domain: "sensor" } },
+        selector: NOOP_ENTITY_SELECTOR,
       },
       {
         name: "effort",
         label: "Effort entity",
-        selector: { entity: { domain: "sensor" } },
+        selector: NOOP_ENTITY_SELECTOR,
       },
       {
         name: "rest",
         label: "Rest entity",
-        selector: { entity: { domain: "sensor" } },
+        selector: NOOP_ENTITY_SELECTOR,
       },
       {
         name: "battery",
         label: "Battery entity",
-        selector: { entity: { domain: "sensor" } },
+        selector: NOOP_ENTITY_SELECTOR,
       },
       {
         name: "steps",
         label: "Steps entity",
-        selector: { entity: { domain: "sensor" } },
+        selector: NOOP_ENTITY_SELECTOR,
       },
       {
         name: "sync",
         label: "Sync entity",
-        selector: { entity: { domain: "sensor" } },
+        selector: NOOP_ENTITY_SELECTOR,
       },
     ];
   }
@@ -415,7 +418,10 @@ class NoopCardEditor extends HTMLElement {
     currentForm.schema = this._schema;
     currentForm.data = this._config;
     currentForm.computeLabel = (schema) => schema.label;
-    currentForm.addEventListener("value-changed", (event) => this._valueChanged(event), { once: true });
+    if (!currentForm.hasAttribute("data-noop-listener")) {
+      currentForm.addEventListener("value-changed", this._handleValueChanged);
+      currentForm.setAttribute("data-noop-listener", "");
+    }
   }
 
   _valueChanged(event) {
