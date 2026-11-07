@@ -76,22 +76,27 @@ const styles = `
   .fill::before,
   .fill::after {
     position: absolute;
-    top: -7px;
-    left: -30%;
-    width: 160%;
-    height: 14px;
-    border-radius: 45%;
-    background: rgb(255 255 255 / 18%);
+    top: -9px;
+    left: -50%;
+    width: 200%;
+    height: 18px;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 20%);
+    box-shadow: 42px 2px 0 -1px rgb(255 255 255 / 17%),
+      84px 0 rgb(255 255 255 / 20%),
+      126px 2px 0 -1px rgb(255 255 255 / 17%),
+      168px 0 rgb(255 255 255 / 20%);
     content: "";
-    animation: noop-wave 7s linear infinite;
+    animation: noop-wave 8s linear infinite;
     will-change: transform;
   }
 
   .fill::after {
-    top: -3px;
-    opacity: 0.45;
-    animation-delay: -3.5s;
-    animation-duration: 9s;
+    top: -5px;
+    opacity: 0.38;
+    transform: translateX(-42%);
+    animation-delay: -4s;
+    animation-duration: 11s;
   }
 
   .sparkles {
@@ -107,11 +112,8 @@ const styles = `
   }
 
   @keyframes noop-wave {
-    0% { transform: translate3d(-4%, 1px, 0) rotate(1deg); }
-    25% { transform: translate3d(-1%, -1px, 0) rotate(0deg); }
-    50% { transform: translate3d(4%, 1px, 0) rotate(-1deg); }
-    75% { transform: translate3d(1%, -1px, 0) rotate(0deg); }
-    100% { transform: translate3d(-4%, 1px, 0) rotate(1deg); }
+    from { transform: translateX(-25%); }
+    to { transform: translateX(25%); }
   }
 
   @keyframes noop-sparkle {
