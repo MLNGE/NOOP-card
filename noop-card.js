@@ -70,33 +70,28 @@ const styles = `
     height: var(--fill-height);
     overflow: hidden;
     background: var(--metric-color);
-    transition: height 600ms ease;
+    contain: paint;
+    transition: height 700ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  .fill::before,
-  .fill::after {
+  .wave {
     position: absolute;
-    top: -9px;
+    top: -7px;
     left: -50%;
     width: 200%;
     height: 18px;
-    border-radius: 50%;
-    background: rgb(255 255 255 / 20%);
-    box-shadow: 42px 2px 0 -1px rgb(255 255 255 / 17%),
-      84px 0 rgb(255 255 255 / 20%),
-      126px 2px 0 -1px rgb(255 255 255 / 17%),
-      168px 0 rgb(255 255 255 / 20%);
-    content: "";
-    animation: noop-wave 8s linear infinite;
+    overflow: visible;
+    fill: rgb(255 255 255 / 20%);
+    pointer-events: none;
+    animation: noop-wave 9s linear infinite;
     will-change: transform;
   }
 
-  .fill::after {
-    top: -5px;
-    opacity: 0.38;
-    transform: translateX(-42%);
-    animation-delay: -4s;
-    animation-duration: 11s;
+  .wave-two {
+    top: -4px;
+    fill: rgb(255 255 255 / 13%);
+    animation-delay: -4.5s;
+    animation-duration: 12s;
   }
 
   .sparkles {
@@ -107,18 +102,19 @@ const styles = `
       radial-gradient(circle at 70% 22%, rgb(255 255 255 / 55%) 0 1px, transparent 1.8px),
       radial-gradient(circle at 80% 66%, rgb(255 255 255 / 65%) 0 1px, transparent 1.8px),
       radial-gradient(circle at 38% 78%, rgb(255 255 255 / 45%) 0 1px, transparent 1.8px);
-    animation: noop-sparkle 4.5s ease-in-out infinite alternate;
-    will-change: opacity, transform;
+    animation: noop-sparkle 5s ease-in-out infinite alternate;
+    pointer-events: none;
+    will-change: opacity;
   }
 
   @keyframes noop-wave {
-    from { transform: translateX(-25%); }
-    to { transform: translateX(25%); }
+    from { transform: translate3d(-25%, 0, 0); }
+    to { transform: translate3d(0, 0, 0); }
   }
 
   @keyframes noop-sparkle {
-    0% { opacity: 0.25; transform: scale(0.96); }
-    100% { opacity: 0.85; transform: scale(1.04); }
+    0%, 100% { opacity: 0.28; }
+    50% { opacity: 0.8; }
   }
 
   .value {
@@ -334,7 +330,15 @@ class NoopCard extends HTMLElement {
     const metrics = METRIC_DEFINITIONS.map(({ key, label, className }) => `
       <div class="metric">
         <div class="circle" style="--metric-color: var(--noop-${className}, ${className === "rest" ? "#20af6d" : className === "effort" ? "#b77724" : "#c56b36"}); --fill-height: ${metricPercentage(states[key])}%">
-          <div class="fill"><span class="sparkles"></span></div>
+          <div class="fill">
+            <svg class="wave wave-one" viewBox="0 0 200 24" preserveAspectRatio="none" aria-hidden="true">
+              <path d="M0 12 C12.5 4 25 4 37.5 12 S62.5 20 75 12 S100 4 112.5 12 S137.5 20 150 12 S175 4 187.5 12 S212.5 20 225 12 V24 H0 Z"></path>
+            </svg>
+            <svg class="wave wave-two" viewBox="0 0 200 24" preserveAspectRatio="none" aria-hidden="true">
+              <path d="M0 12 C12.5 4 25 4 37.5 12 S62.5 20 75 12 S100 4 112.5 12 S137.5 20 150 12 S175 4 187.5 12 S212.5 20 225 12 V24 H0 Z"></path>
+            </svg>
+            <span class="sparkles"></span>
+          </div>
           <span class="value">${formatValue(states[key])}</span>
         </div>
         <div class="label">${label}</div>
