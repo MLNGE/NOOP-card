@@ -1,6 +1,6 @@
 {
   "name": "noop-card",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "private": true,
   "description": "Compact Home Assistant Lovelace card for NOOP health metrics.",
   "scripts": {

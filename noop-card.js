@@ -499,7 +499,7 @@ class NoopCard extends HTMLElement {
     const entities = this._detailEntityIds();
     if (!entities.length) return;
 
-    if (this._hass?.callService) {
+    if (this._hass?.services?.browser_mod?.popup) {
       const content = {
         type: "vertical-stack",
         cards: [
@@ -517,11 +517,29 @@ class NoopCard extends HTMLElement {
           },
         ],
       };
+      this.dispatchEvent(new CustomEvent("ll-custom", {
+        bubbles: true,
+        composed: true,
+        detail: {
+          browser_mod: {
+            service: "browser_mod.popup",
+            data: {
+              title: "NOOP details",
+              content,
+              initial_style: "wide",
+            },
+          },
+        },
+      }));
+      return;
+    }
+
+    if (this._hass?.callService) {
       try {
         await this._hass.callService("browser_mod", "popup", {
           title: "NOOP details",
           content,
-          size: "wide",
+          initial_style: "wide",
         });
         return;
       } catch (error) {
