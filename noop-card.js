@@ -257,6 +257,13 @@ function lastReportedAt(state) {
     state?.last_changed;
 }
 
+function latestReportedAt(states) {
+  return Object.values(states)
+    .map(lastReportedAt)
+    .filter((timestamp) => timestamp && Number.isFinite(Date.parse(timestamp)))
+    .sort((a, b) => Date.parse(b) - Date.parse(a))[0];
+}
+
 class NoopCard extends HTMLElement {
   static getConfigElement() {
     return document.createElement("noop-card-editor");
@@ -467,7 +474,11 @@ class NoopCard extends HTMLElement {
       chargePct: metricPercentage(states.charge),
       effortPct: metricPercentage(states.effort),
       restPct: metricPercentage(states.rest),
-      sync: relativeTime(lastReportedAt(states.sync)),
+      sync: relativeTime(
+        this._config?.entities?.sync
+          ? lastReportedAt(states.sync)
+          : latestReportedAt(states),
+      ),
       battery: formatBattery(states.battery),
       steps: formatSteps(states.steps),
     };

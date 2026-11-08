@@ -62,4 +62,4 @@ entities:
   sync: sensor.noop_tim_noop_charge
 ```
 
-The sync timestamp uses the charge entity and reads `last_reported` (including integrations that expose it as an attribute), falling back to `last_updated` and `last_changed`. The relative time refreshes every 30 seconds.
+The sync timestamp uses the newest report from the resolved NOOP entities and reads `last_reported` (including integrations that expose it as an attribute), falling back to `last_updated` and `last_changed`. An explicitly configured `sync` entity overrides this behavior. The relative time refreshes every 30 seconds.
