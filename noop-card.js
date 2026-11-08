@@ -488,19 +488,18 @@ class NoopCard extends HTMLElement {
 
   _fireMoreInfo(entityId) {
     if (!entityId) return;
-    const event = new Event("hass-more-info", {
+    this.dispatchEvent(new CustomEvent("hass-more-info", {
       bubbles: true,
       composed: true,
-    });
-    event.detail = { entityId };
-    this.dispatchEvent(event);
+      detail: { entityId },
+    }));
   }
 
-  _openDetails() {
+  async _openDetails() {
     const entities = this._detailEntityIds();
     if (!entities.length) return;
 
-    if (this._hass?.services?.browser_mod?.popup && this._hass.callService) {
+    if (this._hass?.callService) {
       const content = {
         type: "vertical-stack",
         cards: [
@@ -518,12 +517,16 @@ class NoopCard extends HTMLElement {
           },
         ],
       };
-      this._hass.callService("browser_mod", "popup", {
-        title: "NOOP details",
-        content,
-        size: "wide",
-      });
-      return;
+      try {
+        await this._hass.callService("browser_mod", "popup", {
+          title: "NOOP details",
+          content,
+          size: "wide",
+        });
+        return;
+      } catch (error) {
+        console.warn("NOOP Card could not open browser_mod popup; using more-info.", error);
+      }
     }
 
     this._fireMoreInfo(entities[0]);
