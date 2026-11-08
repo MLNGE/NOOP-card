@@ -63,3 +63,5 @@ entities:
 ```
 
 The sync timestamp uses the newest report from the resolved NOOP entities and reads `last_reported` (including integrations that expose it as an attribute), falling back to `last_updated` and `last_changed`. An explicitly configured `sync` entity overrides this behavior. The relative time refreshes every 30 seconds.
+
+Click the card to open NOOP details. When `browser_mod` is installed, the popup includes current values and 24-hour history graphs. Configure `entities.heart_rate` to include a heart-rate sensor; otherwise the card prefers the live NOOP heart-rate entity and ignores unavailable average/resting sensors. Without `browser_mod`, clicking opens the charge entity's standard Home Assistant more-info dialog.

@@ -7,6 +7,8 @@ const DEFAULT_METRICS = {
   sync: "sensor.noop_tim_noop_charge",
 };
 
+const DETAIL_KEYS = ["charge", "effort", "rest", "battery", "steps", "heart_rate"];
+
 const METRIC_DEFINITIONS = [
   { key: "charge", label: "Charge", className: "charge" },
   { key: "effort", label: "Effort", className: "effort" },
@@ -29,6 +31,7 @@ const styles = `
     min-height: 0;
     padding: 10px 18px 9px;
     overflow: hidden;
+    cursor: pointer;
     color: var(--noop-card-text);
     background: var(--noop-card-background);
     border: 1px solid color-mix(in srgb, var(--primary-color, #5ca9ff) 70%, transparent);
@@ -418,6 +421,17 @@ class NoopCard extends HTMLElement {
       </ha-card>
     `;
 
+    const card = this.shadowRoot.querySelector(".card");
+    card.addEventListener("click", () => this._openDetails());
+    card.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        this._openDetails();
+      }
+    });
+    card.setAttribute("role", "button");
+    card.setAttribute("tabindex", "0");
+
     this._els = {
       error: this.shadowRoot.querySelector(".error"),
       body: this.shadowRoot.querySelector(".body"),
@@ -435,6 +449,84 @@ class NoopCard extends HTMLElement {
     }
     this._mounted = true;
     this._signature = "";
+  }
+
+  _detailEntityIds() {
+    const configured = this._config?.entities || {};
+    const states = this._hass?.states || {};
+    const entities = [];
+
+    for (const key of DETAIL_KEYS) {
+      const entityId = configured[key] || this._entityId(key);
+      if (entityId && states[entityId]) entities.push(entityId);
+    }
+
+    if (!configured.heart_rate) {
+      const heartRateEntity = Object.keys(states)
+        .filter((entityId) => {
+          const normalized = entityId.toLowerCase();
+          return normalized.includes("noop") &&
+            ["heart_rate", "heartrate", "pulse"].some((token) => normalized.includes(token));
+        })
+        .sort((a, b) => {
+          const score = (entityId) => {
+            const normalized = entityId.toLowerCase();
+            if (isUnavailable(states[entityId])) return 10;
+            if (normalized.endsWith("_heart_rate")) return 0;
+            if (normalized.endsWith("_heartrate") || normalized.endsWith("_pulse")) return 1;
+            if (normalized.includes("resting")) return 2;
+            if (normalized.includes("avg") || normalized.includes("average")) return 3;
+            return 4;
+          };
+          return score(a) - score(b);
+        })[0];
+      if (heartRateEntity) entities.push(heartRateEntity);
+    }
+
+    return [...new Set(entities)];
+  }
+
+  _fireMoreInfo(entityId) {
+    if (!entityId) return;
+    const event = new Event("hass-more-info", {
+      bubbles: true,
+      composed: true,
+    });
+    event.detail = { entityId };
+    this.dispatchEvent(event);
+  }
+
+  _openDetails() {
+    const entities = this._detailEntityIds();
+    if (!entities.length) return;
+
+    if (this._hass?.services?.browser_mod?.popup && this._hass.callService) {
+      const content = {
+        type: "vertical-stack",
+        cards: [
+          {
+            type: "entities",
+            title: "Current NOOP metrics",
+            entities,
+          },
+          {
+            type: "history-graph",
+            title: "NOOP trends",
+            entities: entities.map((entity) => ({ entity })),
+            hours_to_show: 24,
+            show_names: true,
+          },
+        ],
+      };
+      this._hass.callService("browser_mod", "popup", {
+        title: "NOOP details",
+        content,
+        size: "wide",
+      });
+      return;
+    }
+
+    this._fireMoreInfo(entities[0]);
   }
 
   _render() {
@@ -546,6 +638,11 @@ class NoopCardEditor extends HTMLElement {
         label: "Sync entity",
         selector: NOOP_ENTITY_SELECTOR,
       },
+      {
+        name: "heart_rate",
+        label: "Heart rate entity",
+        selector: NOOP_ENTITY_SELECTOR,
+      },
     ];
   }
 
@@ -559,6 +656,7 @@ class NoopCardEditor extends HTMLElement {
       battery: entities.battery || "",
       steps: entities.steps || "",
       sync: entities.sync || "",
+      heart_rate: entities.heart_rate || "",
     };
     this._render();
   }
@@ -593,7 +691,7 @@ class NoopCardEditor extends HTMLElement {
   _valueChanged(event) {
     const value = event.detail.value || {};
     const entities = {};
-    for (const key of ["charge", "effort", "rest", "battery", "steps", "sync"]) {
+    for (const key of ["charge", "effort", "rest", "battery", "steps", "sync", "heart_rate"]) {
       if (value[key]) entities[key] = value[key];
     }
 
