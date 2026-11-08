@@ -62,4 +62,4 @@ entities:
   sync: sensor.noop_tim_noop_charge
 ```
 
-The sync timestamp uses `last_reported`, falling back to `last_updated`. The relative time refreshes every 30 seconds.
+The sync timestamp uses the charge entity, and reads `last_reported`, falling back to `last_updated`. The relative time refreshes every 30 seconds.

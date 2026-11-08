@@ -349,18 +349,22 @@ class NoopCard extends HTMLElement {
     }
 
     if (pending.length) {
-      const found = Object.fromEntries(pending.map((key) => [key, null]));
+      const searchable = pending.filter((key) => key !== "sync");
+      const found = Object.fromEntries(searchable.map((key) => [key, null]));
       for (const entityId of Object.keys(states)) {
         const normalized = entityId.toLowerCase();
         if (!normalized.includes("noop")) continue;
-        for (const key of pending) {
+        for (const key of searchable) {
           if (found[key]) continue;
           if ((tokenCandidates[key] || []).some((token) => normalized.endsWith(token) || normalized.includes(token))) {
             found[key] = entityId;
           }
         }
       }
-      for (const key of pending) resolved[key] = found[key] || DEFAULT_METRICS[key];
+      for (const key of searchable) resolved[key] = found[key] || DEFAULT_METRICS[key];
+      if (pending.includes("sync")) {
+        resolved.sync = resolved.charge || DEFAULT_METRICS.charge;
+      }
     }
 
     const complete = Object.values(resolved).every((entityId) => states[entityId]);
