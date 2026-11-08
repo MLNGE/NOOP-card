@@ -250,6 +250,13 @@ function relativeTime(timestamp, now = Date.now()) {
   return `${Math.floor(hours / 24)}d ago`;
 }
 
+function lastReportedAt(state) {
+  return state?.last_reported ||
+    state?.attributes?.last_reported ||
+    state?.last_updated ||
+    state?.last_changed;
+}
+
 class NoopCard extends HTMLElement {
   static getConfigElement() {
     return document.createElement("noop-card-editor");
@@ -460,7 +467,7 @@ class NoopCard extends HTMLElement {
       chargePct: metricPercentage(states.charge),
       effortPct: metricPercentage(states.effort),
       restPct: metricPercentage(states.rest),
-      sync: relativeTime(states.sync.last_reported || states.sync.last_updated),
+      sync: relativeTime(lastReportedAt(states.sync)),
       battery: formatBattery(states.battery),
       steps: formatSteps(states.steps),
     };
